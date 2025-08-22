@@ -6,6 +6,7 @@ import { TripCard } from '@/components/TripCard';
 import { Button } from '@/components/ui/button';
 import { Plus, MapPin, Plane } from 'lucide-react';
 import heroImage from '@/assets/hero-travel.jpg';
+import { DestinationCarousel } from '@/components/DestinationCarousel';
 
 export default function Dashboard() {
   const [trips, setTrips] = useState<TripPlan[]>(mockTrips);
@@ -43,6 +44,10 @@ export default function Dashboard() {
 
       {/* Dashboard Content */}
       <div className="container mx-auto px-4 py-12">
+        {/* Destination Carousel Section */}
+        <div className="mb-16 animate-fade-in">
+          <DestinationCarousel />
+        </div>
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
             <Plane className="w-8 h-8 text-primary" />
