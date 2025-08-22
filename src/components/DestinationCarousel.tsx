@@ -61,7 +61,7 @@ export function DestinationCarousel() {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % destinations.length);
-    }, 5000);
+    }, 3000);
 
     return () => clearInterval(timer);
   }, []);

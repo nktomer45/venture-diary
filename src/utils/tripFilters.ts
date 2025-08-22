@@ -15,8 +15,8 @@ export const defaultFilters: FilterOptions = {
 };
 
 export function filterTrips(trips: TripPlan[], filters: FilterOptions): TripPlan[] {
+  if (!Array.isArray(trips)) return [];
   let filteredTrips = [...trips];
-
   // Search filter
   if (filters.search.trim()) {
     const searchTerm = filters.search.toLowerCase();

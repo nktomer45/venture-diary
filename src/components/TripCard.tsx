@@ -45,7 +45,7 @@ export function TripCard({ trip, onEdit }: TripCardProps) {
         </div>
         
         <div className="text-xs text-muted-foreground pt-2 border-t border-border/50">
-          Created {trip.createdAt.toLocaleDateString()}
+          Created At: {trip.createdAt ? new Date(trip.createdAt).toLocaleDateString() : "N/A"}
         </div>
       </CardContent>
     </Card>

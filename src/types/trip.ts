@@ -4,5 +4,5 @@ export interface TripPlan {
   destination: string;
   days: number;
   budget: number;
-  createdAt: Date;
+  createdAt?: Date;
 }

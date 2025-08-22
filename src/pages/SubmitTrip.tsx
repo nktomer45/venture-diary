@@ -4,22 +4,32 @@ import { TripForm } from '@/components/TripForm';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Compass } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import  useCreateTrips from '../hooks/createTrips'
+
 
 export default function SubmitTrip() {
   const navigate = useNavigate();
+  const  { createTrip, loading, error, success } = useCreateTrips()
 
-  const handleSubmit = (tripData: Omit<TripPlan, 'id' | 'createdAt'>) => {
-    // In a real app, this would make an API call
-    console.log('Creating new trip:', tripData);
-    
+  const handleSubmit = async (tripData: Omit<TripPlan, "id" | "createdAt">) => {
+  try {
+    const newTrip = await createTrip(tripData);
+
     toast({
       title: "Trip Created Successfully! ✈️",
-      description: `Your "${tripData.title}" trip has been planned!`,
+      description: `Your "${newTrip?.title}" trip has been planned!`,
     });
 
-    // Navigate back to dashboard
-    navigate('/');
-  };
+    navigate("/");
+  } catch (err: any) {
+    toast({
+      title: "Failed to Create Trip ❌",
+      description: err.message || "Please try again.",
+      variant: "destructive",
+    });
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-sky">

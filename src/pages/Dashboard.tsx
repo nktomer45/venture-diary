@@ -1,7 +1,5 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TripPlan } from '@/types/trip';
-import { mockTrips } from '@/data/mockTrips';
 import { TripCard } from '@/components/TripCard';
 import { Button } from '@/components/ui/button';
 import { SearchAndFilters } from '@/components/SearchAndFilters';
@@ -10,10 +8,14 @@ import { useTripsFilter } from '@/hooks/useTripsFilter';
 import { Plus, MapPin, Plane } from 'lucide-react';
 import heroImage from '@/assets/hero-travel.jpg';
 import { DestinationCarousel } from '@/components/DestinationCarousel';
+import { useTrips } from '@/hooks/useTrips';
 
 export default function Dashboard() {
-  const [allTrips] = useState<TripPlan[]>(mockTrips);
   const navigate = useNavigate();
+  const { trips: fetchedTrips, loading, error } = useTrips();
+  const allTrips = fetchedTrips?.trips || [];
+  
+
   
   const {
     trips,
@@ -27,15 +29,34 @@ export default function Dashboard() {
     clearFilters,
     goToPage,
     hasFilters
-  } = useTripsFilter(allTrips, 6);
+  } = useTripsFilter(allTrips);
 
   const handleEdit = (trip: TripPlan) => {
     navigate(`/edit/${trip.id}`);
   };
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-lg text-muted-foreground">Loading trips...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen text-center">
+        <p className="text-red-500 text-lg font-semibold">Failed to load trips</p>
+        <Button onClick={() => window.location.reload()} className="ml-3">
+          Retry
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-sky">
-      {/* Hero Section */}
+      
       <div 
         className="relative h-96 bg-cover bg-center bg-no-repeat flex items-center justify-center"
         style={{ backgroundImage: `url(${heroImage})` }}
@@ -61,10 +82,7 @@ export default function Dashboard() {
 
       {/* Dashboard Content */}
       <div className="container mx-auto px-4 py-12">
-        {/* Destination Carousel Section */}
-        <div className="mb-16 animate-fade-in">
-          <DestinationCarousel />
-        </div>
+        
         {/* Trip Management Section */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
@@ -143,6 +161,10 @@ export default function Dashboard() {
             </Button>
           </div>
         )}
+        {/* Destination Carousel Section */}
+        <div className="mt-16 animate-fade-in">
+          <DestinationCarousel />
+        </div>
       </div>
     </div>
   );
