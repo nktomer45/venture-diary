@@ -4,13 +4,30 @@ import { TripPlan } from '@/types/trip';
 import { mockTrips } from '@/data/mockTrips';
 import { TripCard } from '@/components/TripCard';
 import { Button } from '@/components/ui/button';
+import { SearchAndFilters } from '@/components/SearchAndFilters';
+import { Pagination } from '@/components/Pagination';
+import { useTripsFilter } from '@/hooks/useTripsFilter';
 import { Plus, MapPin, Plane } from 'lucide-react';
 import heroImage from '@/assets/hero-travel.jpg';
 import { DestinationCarousel } from '@/components/DestinationCarousel';
 
 export default function Dashboard() {
-  const [trips, setTrips] = useState<TripPlan[]>(mockTrips);
+  const [allTrips] = useState<TripPlan[]>(mockTrips);
   const navigate = useNavigate();
+  
+  const {
+    trips,
+    totalPages,
+    totalItems,
+    filteredCount,
+    filters,
+    currentPage,
+    updateFilter,
+    updateSearch,
+    clearFilters,
+    goToPage,
+    hasFilters
+  } = useTripsFilter(allTrips, 6);
 
   const handleEdit = (trip: TripPlan) => {
     navigate(`/edit/${trip.id}`);
@@ -48,6 +65,7 @@ export default function Dashboard() {
         <div className="mb-16 animate-fade-in">
           <DestinationCarousel />
         </div>
+        {/* Trip Management Section */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
             <Plane className="w-8 h-8 text-primary" />
@@ -65,24 +83,63 @@ export default function Dashboard() {
           </Button>
         </div>
 
+        {/* Search and Filters */}
+        <SearchAndFilters
+          filters={filters}
+          onUpdateFilter={updateFilter}
+          onUpdateSearch={updateSearch}
+          onClearFilters={clearFilters}
+          hasFilters={hasFilters}
+          totalItems={totalItems}
+          filteredCount={filteredCount}
+        />
+
+        {/* Trip Cards Grid */}
         {trips.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {trips.map((trip) => (
-              <TripCard key={trip.id} trip={trip} onEdit={handleEdit} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
+              {trips.map((trip) => (
+                <TripCard key={trip.id} trip={trip} onEdit={handleEdit} />
+              ))}
+            </div>
+            
+            {/* Pagination */}
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={goToPage}
+              totalItems={filteredCount}
+              itemsPerPage={6}
+            />
+          </>
         ) : (
           <div className="text-center py-16">
             <MapPin className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-2xl font-semibold text-foreground mb-2">No trips planned yet</h3>
-            <p className="text-muted-foreground mb-6">Start planning your next adventure!</p>
+            <h3 className="text-2xl font-semibold text-foreground mb-2">
+              {hasFilters ? 'No trips match your filters' : 'No trips planned yet'}
+            </h3>
+            <p className="text-muted-foreground mb-6">
+              {hasFilters 
+                ? 'Try adjusting your search criteria or clear filters to see all trips.' 
+                : 'Start planning your next adventure!'
+              }
+            </p>
+            {hasFilters ? (
+              <Button 
+                onClick={clearFilters}
+                variant="outline"
+                className="mr-3"
+              >
+                Clear Filters
+              </Button>
+            ) : null}
             <Button 
               onClick={() => navigate('/submit')}
               size="lg"
               className="bg-gradient-ocean hover:bg-primary-hover text-white font-medium"
             >
               <Plus className="w-5 h-5 mr-2" />
-              Plan Your First Trip
+              {hasFilters ? 'Plan New Trip' : 'Plan Your First Trip'}
             </Button>
           </div>
         )}
